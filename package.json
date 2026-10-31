@@ -1,12 +1,13 @@
 {
-  "name": "ag-paypal-demo",
+  "name": "allowance-paypal-agents",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "node --test lib/allowance/*.test.ts"
   },
   "dependencies": {
     "ag-grid-community": "36.2.0",
