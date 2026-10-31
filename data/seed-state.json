@@ -1,0 +1,664 @@
+{
+  "mandates": [
+    {
+      "id": "gift-finder",
+      "agent": "gift-finder",
+      "currency": "USD",
+      "perPurchaseCapCents": 15000,
+      "autoApproveUpToCents": 3000,
+      "dailyBudgetCents": 25000,
+      "monthlyBudgetCents": 100000,
+      "maxAutoApprovalsPerHour": 5,
+      "blockedMerchants": [],
+      "paused": false
+    },
+    {
+      "id": "office-restock",
+      "agent": "office-restock",
+      "currency": "USD",
+      "perPurchaseCapCents": 8000,
+      "autoApproveUpToCents": 2500,
+      "dailyBudgetCents": 10000,
+      "paused": false
+    }
+  ],
+  "purchases": [
+    {
+      "id": "56793ac0-aee0-4e27-a94d-7484a574e8ae",
+      "mandateId": "office-restock",
+      "agent": "office-restock",
+      "productId": "RoS7WQ0",
+      "title": "LED Desk Lamp",
+      "merchant": "walmart.com",
+      "category": "Desk Lamps",
+      "amountCents": 2999,
+      "currency": "USD",
+      "buyUrl": "https://buy.trychannel3.com/RoS7WQ0-BsaX-x4k3ak?o=01KSPRSBHSD18W9T2WC29SYHP8&aid=01M69BWJKX26B6TDAYWACY08ZR",
+      "rationale": "The LEPOWER LED Desk Lamp from Walmart provides a warm light setting at a low price of $29.99, fitting the front desk need while staying well within the daily budget.",
+      "status": "captured",
+      "decision": {
+        "outcome": "needs_human",
+        "reasons": [
+          {
+            "code": "ABOVE_AUTO_APPROVE_LIMIT",
+            "detail": "$29.99 is above the $25.00 the agent may spend on its own."
+          }
+        ]
+      },
+      "createdAt": "2026-10-31T16:15:08.069Z",
+      "updatedAt": "2026-10-31T16:15:14.078Z",
+      "log": [
+        {
+          "at": "2026-10-31T16:15:08.069Z",
+          "event": "proposed",
+          "note": "The LEPOWER LED Desk Lamp from Walmart provides a warm light setting at a low price of $29.99, fitting the front desk need while staying well within the daily budget."
+        },
+        {
+          "at": "2026-10-31T16:15:08.070Z",
+          "event": "policy_needs_human",
+          "note": "$29.99 is above the $25.00 the agent may spend on its own."
+        },
+        {
+          "at": "2026-10-31T16:15:09.511Z",
+          "event": "human_approved"
+        },
+        {
+          "at": "2026-10-31T16:15:12.010Z",
+          "event": "order_created",
+          "note": "PayPal order 84F1748565267670B, intent AUTHORIZE, funded by the sandbox test card"
+        },
+        {
+          "at": "2026-10-31T16:15:12.011Z",
+          "event": "buyer_approved_and_authorized",
+          "note": "Authorization 3H805593DJ5298315"
+        },
+        {
+          "at": "2026-10-31T16:15:14.078Z",
+          "event": "captured",
+          "note": "Capture 3LC72222E6273645S"
+        }
+      ],
+      "approvedBy": "human",
+      "orderId": "84F1748565267670B",
+      "authorizationId": "3H805593DJ5298315",
+      "captureId": "3LC72222E6273645S",
+      "capturedCents": 2899
+    },
+    {
+      "id": "ef875b15-190f-4c9e-9fd7-111233793307",
+      "mandateId": "office-restock",
+      "agent": "office-restock",
+      "productId": "IPIEbSK",
+      "title": "Modern Spiral Table Lamp – Creative LED Desk Lamp with Gentle Warm Light, Perfect for Bedroom, Living Room, and Study Decor",
+      "merchant": "bowlift.com",
+      "category": "Table Lamps",
+      "amountCents": 6999,
+      "currency": "USD",
+      "buyUrl": "https://buy.trychannel3.com/IPIEbSK-83Z3-x4k3ak?o=01M63K5N2KW49SRCWM1XBTG33M&aid=01M69BWFRVFJYEQEZFZEEBGN5N",
+      "rationale": "The Modern Spiral Table Lamp offers gentle warm light at an affordable $69.99, making it a suitable, cost‑effective choice for the front desk.",
+      "status": "denied",
+      "decision": {
+        "outcome": "deny",
+        "reasons": [
+          {
+            "code": "OVER_DAILY_BUDGET",
+            "detail": "$33.16 already committed in the last 24 hours, so $69.99 would pass the $100.00 daily budget."
+          }
+        ]
+      },
+      "createdAt": "2026-10-31T16:15:05.207Z",
+      "updatedAt": "2026-10-31T16:15:05.208Z",
+      "log": [
+        {
+          "at": "2026-10-31T16:15:05.207Z",
+          "event": "proposed",
+          "note": "The Modern Spiral Table Lamp offers gentle warm light at an affordable $69.99, making it a suitable, cost‑effective choice for the front desk."
+        },
+        {
+          "at": "2026-10-31T16:15:05.208Z",
+          "event": "policy_denied",
+          "note": "$33.16 already committed in the last 24 hours, so $69.99 would pass the $100.00 daily budget."
+        }
+      ]
+    },
+    {
+      "id": "e9cd371e-6b5a-405e-a2d7-7ba35140b80c",
+      "mandateId": "office-restock",
+      "agent": "office-restock",
+      "productId": "BYrOlf5",
+      "title": "Steelcase Series 1 Office Chair",
+      "merchant": "steelcase.com",
+      "category": "Office Chairs",
+      "amountCents": 2290,
+      "currency": "USD",
+      "buyUrl": "https://buy.trychannel3.com/BYrOlf5-h9va-x4k3ak?o=01M2JNRBT9ZFSZE9JPSZPEFBZM&aid=01M69BWA97WJCSTZJQH62HAXK5",
+      "rationale": "The Steelcase Series 1 ergonomic chair provides reputable comfort and adjustability at $22.90, staying within the $25 autonomous spend limit for the team room.",
+      "status": "voided",
+      "decision": {
+        "outcome": "auto_approve",
+        "reasons": [
+          {
+            "code": "WITHIN_MANDATE",
+            "detail": "$22.90 is inside every limit of the mandate."
+          }
+        ]
+      },
+      "createdAt": "2026-10-31T16:15:00.173Z",
+      "updatedAt": "2026-10-31T16:15:14.829Z",
+      "log": [
+        {
+          "at": "2026-10-31T16:15:00.173Z",
+          "event": "proposed",
+          "note": "The Steelcase Series 1 ergonomic chair provides reputable comfort and adjustability at $22.90, staying within the $25 autonomous spend limit for the team room."
+        },
+        {
+          "at": "2026-10-31T16:15:00.174Z",
+          "event": "policy_approved",
+          "note": "$22.90 is inside every limit of the mandate."
+        },
+        {
+          "at": "2026-10-31T16:15:02.878Z",
+          "event": "order_created",
+          "note": "PayPal order 1E0524655P1009830, intent AUTHORIZE, funded by the sandbox test card"
+        },
+        {
+          "at": "2026-10-31T16:15:02.878Z",
+          "event": "buyer_approved_and_authorized",
+          "note": "Authorization 3F921897VK062151Y"
+        },
+        {
+          "at": "2026-10-31T16:15:14.829Z",
+          "event": "voided"
+        }
+      ],
+      "approvedBy": "policy",
+      "orderId": "1E0524655P1009830",
+      "authorizationId": "3F921897VK062151Y"
+    },
+    {
+      "id": "5b8c0839-28ba-40b7-a4a2-5faaffeb9cbb",
+      "mandateId": "office-restock",
+      "agent": "office-restock",
+      "productId": "5idmfR3",
+      "title": "Ergonomic Office Chair",
+      "merchant": "bestbuy.com",
+      "category": "Office Chairs",
+      "amountCents": 5499,
+      "currency": "USD",
+      "buyUrl": "https://buy.trychannel3.com/5idmfR3-p1PB-x4k3ak?o=01KXTJNSB0Z5KECAWHCRJZ6B8S&aid=01M69BW7JYFKRAZ5FS3RPEX3SZ",
+      "rationale": "The Giantexus ergonomic office chair offers solid support and adjustability at just $54.99 from Best Buy, comfortably staying under the $80 cap for the team room.",
+      "status": "rejected",
+      "decision": {
+        "outcome": "needs_human",
+        "reasons": [
+          {
+            "code": "ABOVE_AUTO_APPROVE_LIMIT",
+            "detail": "$54.99 is above the $25.00 the agent may spend on its own."
+          }
+        ]
+      },
+      "createdAt": "2026-10-31T16:14:56.851Z",
+      "updatedAt": "2026-10-31T16:15:12.019Z",
+      "log": [
+        {
+          "at": "2026-10-31T16:14:56.851Z",
+          "event": "proposed",
+          "note": "The Giantexus ergonomic office chair offers solid support and adjustability at just $54.99 from Best Buy, comfortably staying under the $80 cap for the team room."
+        },
+        {
+          "at": "2026-10-31T16:14:56.852Z",
+          "event": "policy_needs_human",
+          "note": "$54.99 is above the $25.00 the agent may spend on its own."
+        },
+        {
+          "at": "2026-10-31T16:15:12.019Z",
+          "event": "human_rejected"
+        }
+      ]
+    },
+    {
+      "id": "911850e9-c8a1-4f0f-a764-a9edaff6b571",
+      "mandateId": "office-restock",
+      "agent": "office-restock",
+      "productId": "8hRZnW7",
+      "title": "Leisuremod Aiaria Collection Ergonomic Office Chair",
+      "merchant": "bestbuy.com",
+      "category": "Office Chairs",
+      "amountCents": 12300,
+      "currency": "USD",
+      "buyUrl": "https://buy.trychannel3.com/8hRZnW7-p1PB-x4k3ak?o=01M5320EP3SQRYCSRT3S4ERM4W&aid=01M69BW4S6C8R90ZXFPYHC3B5T",
+      "rationale": "The Leisuremod Aiaria ergonomic chair offers solid adjustability and comfort at a low $123 price from Best Buy, making it a cost‑effective choice for the team room.",
+      "status": "denied",
+      "decision": {
+        "outcome": "deny",
+        "reasons": [
+          {
+            "code": "OVER_PURCHASE_CAP",
+            "detail": "$123.00 is above the $80.00 per purchase cap."
+          }
+        ]
+      },
+      "createdAt": "2026-10-31T16:14:53.840Z",
+      "updatedAt": "2026-10-31T16:14:53.840Z",
+      "log": [
+        {
+          "at": "2026-10-31T16:14:53.840Z",
+          "event": "proposed",
+          "note": "The Leisuremod Aiaria ergonomic chair offers solid adjustability and comfort at a low $123 price from Best Buy, making it a cost‑effective choice for the team room."
+        },
+        {
+          "at": "2026-10-31T16:14:53.840Z",
+          "event": "policy_denied",
+          "note": "$123.00 is above the $80.00 per purchase cap."
+        }
+      ]
+    },
+    {
+      "id": "3ca10185-fa63-45bc-b216-1191bef55c85",
+      "mandateId": "office-restock",
+      "agent": "office-restock",
+      "productId": "uc7VEuG",
+      "title": "BondPaper",
+      "merchant": "walmart.com",
+      "category": "Printer & Copier Paper",
+      "amountCents": 627,
+      "currency": "USD",
+      "buyUrl": "https://buy.trychannel3.com/uc7VEuG-BsaX-x4k3ak?o=01M1TYTCV6QKT99B42NPXAK857&aid=01M69BVZN7Q75QRFESSQN4SY0N",
+      "rationale": "Walmart offers the lowest price ($6.27) for a standard 500-sheet 8.5x11 ream, meeting the request for the cheapest reliable printer paper.",
+      "status": "captured",
+      "decision": {
+        "outcome": "auto_approve",
+        "reasons": [
+          {
+            "code": "WITHIN_MANDATE",
+            "detail": "$6.27 is inside every limit of the mandate."
+          }
+        ]
+      },
+      "createdAt": "2026-10-31T16:14:48.580Z",
+      "updatedAt": "2026-10-31T16:15:16.944Z",
+      "log": [
+        {
+          "at": "2026-10-31T16:14:48.580Z",
+          "event": "proposed",
+          "note": "Walmart offers the lowest price ($6.27) for a standard 500-sheet 8.5x11 ream, meeting the request for the cheapest reliable printer paper."
+        },
+        {
+          "at": "2026-10-31T16:14:48.580Z",
+          "event": "policy_approved",
+          "note": "$6.27 is inside every limit of the mandate."
+        },
+        {
+          "at": "2026-10-31T16:14:51.248Z",
+          "event": "order_created",
+          "note": "PayPal order 2YH35819E80424628, intent AUTHORIZE, funded by the sandbox test card"
+        },
+        {
+          "at": "2026-10-31T16:14:51.248Z",
+          "event": "buyer_approved_and_authorized",
+          "note": "Authorization 5AB800192N326333W"
+        },
+        {
+          "at": "2026-10-31T16:15:16.944Z",
+          "event": "captured",
+          "note": "Capture 9W564115K5060070B"
+        }
+      ],
+      "approvedBy": "policy",
+      "orderId": "2YH35819E80424628",
+      "authorizationId": "5AB800192N326333W",
+      "captureId": "9W564115K5060070B",
+      "capturedCents": 627
+    },
+    {
+      "id": "59748b9c-5e56-43d2-adfb-df74c76f17e7",
+      "mandateId": "office-restock",
+      "agent": "office-restock",
+      "productId": "oijkxTs",
+      "title": "BIC® Cristal® Ballpoint Pens, Medium Point, 1.0 mm, Clear Barrel, Black Ink, Pack Of 12",
+      "merchant": "newegg.com",
+      "category": "Ballpoint Pens",
+      "amountCents": 399,
+      "currency": "USD",
+      "buyUrl": "https://buy.trychannel3.com/oijkxTs-LPzf-x4k3ak?o=01M22547ESE54N48B8C1ZYPPQH&aid=01M69BVT70GMCX3AT0HTEANHS0",
+      "rationale": "The BIC Cristal pack of 12 black ballpoint pens is the lowest priced option under $20, meeting the requested quantity and color.",
+      "status": "voided",
+      "decision": {
+        "outcome": "auto_approve",
+        "reasons": [
+          {
+            "code": "WITHIN_MANDATE",
+            "detail": "$3.99 is inside every limit of the mandate."
+          }
+        ]
+      },
+      "createdAt": "2026-10-31T16:14:43.019Z",
+      "updatedAt": "2026-10-31T16:20:45.071Z",
+      "log": [
+        {
+          "at": "2026-10-31T16:14:43.019Z",
+          "event": "proposed",
+          "note": "The BIC Cristal pack of 12 black ballpoint pens is the lowest priced option under $20, meeting the requested quantity and color."
+        },
+        {
+          "at": "2026-10-31T16:14:43.020Z",
+          "event": "policy_approved",
+          "note": "$3.99 is inside every limit of the mandate."
+        },
+        {
+          "at": "2026-10-31T16:14:45.797Z",
+          "event": "order_created",
+          "note": "PayPal order 5631991082900450X, intent AUTHORIZE, funded by the sandbox test card"
+        },
+        {
+          "at": "2026-10-31T16:14:45.797Z",
+          "event": "buyer_approved_and_authorized",
+          "note": "Authorization 177602403L5224203"
+        },
+        {
+          "at": "2026-10-31T16:20:45.071Z",
+          "event": "voided"
+        }
+      ],
+      "approvedBy": "policy",
+      "orderId": "5631991082900450X",
+      "authorizationId": "177602403L5224203"
+    },
+    {
+      "id": "4590d209-6374-430d-b74e-2d665e0989fc",
+      "mandateId": "gift-finder",
+      "agent": "gift-finder",
+      "productId": "8QUbVmz",
+      "title": "Altiplano Double Jeu Mechanical Silver Dial Leather Watch",
+      "merchant": "jomashop.com",
+      "category": "Watches",
+      "amountCents": 2737500,
+      "currency": "USD",
+      "buyUrl": "https://buy.trychannel3.com/8QUbVmz-IXIa-x4k3ak?o=01KC8N35ZP8ZRHKHG890KJ7D65&aid=01M69BVNTA0VEWB686H03SHM2M",
+      "rationale": "The Piaget Altiplano Double Jeu is a high‑end Swiss mechanical watch with an ultra‑thin movement and premium materials, fitting the luxury gift request while offering the best value among the top‑tier options.",
+      "status": "denied",
+      "decision": {
+        "outcome": "deny",
+        "reasons": [
+          {
+            "code": "OVER_PURCHASE_CAP",
+            "detail": "$27375.00 is above the $150.00 per purchase cap."
+          }
+        ]
+      },
+      "createdAt": "2026-10-31T16:14:39.608Z",
+      "updatedAt": "2026-10-31T16:14:39.609Z",
+      "log": [
+        {
+          "at": "2026-10-31T16:14:39.608Z",
+          "event": "proposed",
+          "note": "The Piaget Altiplano Double Jeu is a high‑end Swiss mechanical watch with an ultra‑thin movement and premium materials, fitting the luxury gift request while offering the best value among the top‑tier options."
+        },
+        {
+          "at": "2026-10-31T16:14:39.609Z",
+          "event": "policy_denied",
+          "note": "$27375.00 is above the $150.00 per purchase cap."
+        }
+      ]
+    },
+    {
+      "id": "55a49141-49e5-4b02-a079-a7aec8ed2258",
+      "mandateId": "gift-finder",
+      "agent": "gift-finder",
+      "productId": "ocv4zSB",
+      "title": "Evening Tales - Pure New Wool Blanket",
+      "merchant": "maisonflaneur.com",
+      "category": "Throw Blankets",
+      "amountCents": 12000,
+      "currency": "USD",
+      "buyUrl": "https://buy.trychannel3.com/ocv4zSB-uAUq-x4k3ak?o=01M3TX7FN2ZJW7A5NQYFGETZ9X&aid=01M69BVGNNQ6KA39ZQ8FKFYNY7",
+      "rationale": "Evening Tales Pure New Wool Blanket offers 100% wool, premium feel, and a reputable maker at $120, well within the $150 cap and under your $200 budget.",
+      "status": "awaiting_human",
+      "decision": {
+        "outcome": "needs_human",
+        "reasons": [
+          {
+            "code": "ABOVE_AUTO_APPROVE_LIMIT",
+            "detail": "$120.00 is above the $30.00 the agent may spend on its own."
+          }
+        ]
+      },
+      "createdAt": "2026-10-31T16:14:34.882Z",
+      "updatedAt": "2026-10-31T16:14:34.883Z",
+      "log": [
+        {
+          "at": "2026-10-31T16:14:34.882Z",
+          "event": "proposed",
+          "note": "Evening Tales Pure New Wool Blanket offers 100% wool, premium feel, and a reputable maker at $120, well within the $150 cap and under your $200 budget."
+        },
+        {
+          "at": "2026-10-31T16:14:34.883Z",
+          "event": "policy_needs_human",
+          "note": "$120.00 is above the $30.00 the agent may spend on its own."
+        }
+      ]
+    },
+    {
+      "id": "115b879a-bfbe-425c-84a0-4bbe4d345301",
+      "mandateId": "gift-finder",
+      "agent": "gift-finder",
+      "productId": "H7MJhYm",
+      "title": "Pure & Simple Wool Blanket",
+      "merchant": "faribaultmill.com",
+      "category": "Blankets",
+      "amountCents": 18400,
+      "currency": "USD",
+      "buyUrl": "https://buy.trychannel3.com/H7MJhYm-88x9-x4k3ak?o=01KBPAVK7WDNPDTRC2TRAADXE5&aid=01M69BVGNNQ6KA39ZQ8FKFYNY7",
+      "rationale": "Faribault Mill is a renowned maker of high-quality 100% wool blankets; this Pure & Simple Wool Blanket offers premium craftsmanship and comfort at $184, comfortably under the $200 limit.",
+      "status": "denied",
+      "decision": {
+        "outcome": "deny",
+        "reasons": [
+          {
+            "code": "OVER_PURCHASE_CAP",
+            "detail": "$184.00 is above the $150.00 per purchase cap."
+          }
+        ]
+      },
+      "createdAt": "2026-10-31T16:14:33.547Z",
+      "updatedAt": "2026-10-31T16:14:33.547Z",
+      "log": [
+        {
+          "at": "2026-10-31T16:14:33.547Z",
+          "event": "proposed",
+          "note": "Faribault Mill is a renowned maker of high-quality 100% wool blankets; this Pure & Simple Wool Blanket offers premium craftsmanship and comfort at $184, comfortably under the $200 limit."
+        },
+        {
+          "at": "2026-10-31T16:14:33.547Z",
+          "event": "policy_denied",
+          "note": "$184.00 is above the $150.00 per purchase cap."
+        }
+      ]
+    },
+    {
+      "id": "b7915653-9439-4394-95dd-b1c8388b7a5c",
+      "mandateId": "gift-finder",
+      "agent": "gift-finder",
+      "productId": "xjZ9lop",
+      "title": "Titan Insulated Jacket",
+      "merchant": "ariat.com",
+      "category": "Coats & Jackets",
+      "amountCents": 14995,
+      "currency": "USD",
+      "buyUrl": "https://buy.trychannel3.com/xjZ9lop-hDVO-x4k3ak?o=01M63V9T2DHS4A07MCQY3P81BX&aid=01M69BVBKDWNXD3K6AFG90EYTW",
+      "rationale": "The Ariat Titan Insulated Jacket is just under the $150 cap, offers solid insulation and durability suitable for winter hiking, and provides good value for the price.",
+      "status": "awaiting_human",
+      "decision": {
+        "outcome": "needs_human",
+        "reasons": [
+          {
+            "code": "ABOVE_AUTO_APPROVE_LIMIT",
+            "detail": "$149.95 is above the $30.00 the agent may spend on its own."
+          }
+        ]
+      },
+      "createdAt": "2026-10-31T16:14:29.723Z",
+      "updatedAt": "2026-10-31T16:14:29.723Z",
+      "log": [
+        {
+          "at": "2026-10-31T16:14:29.723Z",
+          "event": "proposed",
+          "note": "The Ariat Titan Insulated Jacket is just under the $150 cap, offers solid insulation and durability suitable for winter hiking, and provides good value for the price."
+        },
+        {
+          "at": "2026-10-31T16:14:29.723Z",
+          "event": "policy_needs_human",
+          "note": "$149.95 is above the $30.00 the agent may spend on its own."
+        }
+      ]
+    },
+    {
+      "id": "a4a82459-5834-4993-b2ad-284994834231",
+      "mandateId": "gift-finder",
+      "agent": "gift-finder",
+      "productId": "MaSx8pT",
+      "title": "Oxford Insulated Winter Jacket",
+      "merchant": "tractorsupply.com",
+      "category": "Coats & Jackets",
+      "amountCents": 21099,
+      "currency": "USD",
+      "buyUrl": "https://buy.trychannel3.com/MaSx8pT-7Nxp-x4k3ak?o=01M1QDYM3NWJ15XN2VZVS4KHJD&aid=01M69BVBKDWNXD3K6AFG90EYTW",
+      "rationale": "Helly Hansen is a reputable outdoor brand, and this insulated winter jacket offers reliable warmth and durability for hiking, all well within the $300 budget.",
+      "status": "denied",
+      "decision": {
+        "outcome": "deny",
+        "reasons": [
+          {
+            "code": "OVER_PURCHASE_CAP",
+            "detail": "$210.99 is above the $150.00 per purchase cap."
+          }
+        ]
+      },
+      "createdAt": "2026-10-31T16:14:28.505Z",
+      "updatedAt": "2026-10-31T16:14:28.506Z",
+      "log": [
+        {
+          "at": "2026-10-31T16:14:28.505Z",
+          "event": "proposed",
+          "note": "Helly Hansen is a reputable outdoor brand, and this insulated winter jacket offers reliable warmth and durability for hiking, all well within the $300 budget."
+        },
+        {
+          "at": "2026-10-31T16:14:28.506Z",
+          "event": "policy_denied",
+          "note": "$210.99 is above the $150.00 per purchase cap."
+        }
+      ]
+    },
+    {
+      "id": "43cfb2bd-e6a0-4970-903a-6e09fea68d81",
+      "mandateId": "gift-finder",
+      "agent": "gift-finder",
+      "productId": "TnLEXOw",
+      "title": "Moka Ceramic Coffee Mug",
+      "merchant": "miir.com",
+      "category": "Mugs",
+      "amountCents": 2000,
+      "currency": "USD",
+      "buyUrl": "https://buy.trychannel3.com/TnLEXOw-h2JN-x4k3ak?o=01M3QHNJAG9B232N2YMF7VKZHK&aid=01M69BV4PJPMDSPV269VQJ3VWV",
+      "rationale": "MiiR is known for high-quality, stylish ceramic mugs that feel premium yet are affordable at $20, making it a perfect nice stocking stuffer under $25.",
+      "status": "captured",
+      "decision": {
+        "outcome": "auto_approve",
+        "reasons": [
+          {
+            "code": "WITHIN_MANDATE",
+            "detail": "$20.00 is inside every limit of the mandate."
+          }
+        ]
+      },
+      "createdAt": "2026-10-31T16:14:22.006Z",
+      "updatedAt": "2026-10-31T16:15:18.606Z",
+      "log": [
+        {
+          "at": "2026-10-31T16:14:22.006Z",
+          "event": "proposed",
+          "note": "MiiR is known for high-quality, stylish ceramic mugs that feel premium yet are affordable at $20, making it a perfect nice stocking stuffer under $25."
+        },
+        {
+          "at": "2026-10-31T16:14:22.006Z",
+          "event": "policy_approved",
+          "note": "$20.00 is inside every limit of the mandate."
+        },
+        {
+          "at": "2026-10-31T16:14:24.478Z",
+          "event": "order_created",
+          "note": "PayPal order 5YT96858NM0301808, intent AUTHORIZE, funded by the sandbox test card"
+        },
+        {
+          "at": "2026-10-31T16:14:24.479Z",
+          "event": "buyer_approved_and_authorized",
+          "note": "Authorization 0MW95968FB062383U"
+        },
+        {
+          "at": "2026-10-31T16:15:18.606Z",
+          "event": "captured",
+          "note": "Capture 8PV55583BV4909848"
+        }
+      ],
+      "approvedBy": "policy",
+      "orderId": "5YT96858NM0301808",
+      "authorizationId": "0MW95968FB062383U",
+      "captureId": "8PV55583BV4909848",
+      "capturedCents": 2000
+    },
+    {
+      "id": "efd42a07-faf9-4ad2-a78e-38b698398e8b",
+      "mandateId": "gift-finder",
+      "agent": "gift-finder",
+      "productId": "qjjC8f6",
+      "title": "Trekking 2In Merino Socks",
+      "merchant": "uynsports.com",
+      "category": "Thermal Socks",
+      "amountCents": 2660,
+      "currency": "USD",
+      "buyUrl": "https://buy.trychannel3.com/qjjC8f6-E4D5-x4k3ak?o=01M2JGQXK66JEEVBVBBMG13VR2&aid=01M69BTXSQ9MCBT8PTEYYRDRFY",
+      "rationale": "UYN's Trekking 2In Merino Socks are pure merino, designed for trekking, and priced well under $40, making them a warm, high‑quality gift.",
+      "status": "voided",
+      "decision": {
+        "outcome": "auto_approve",
+        "reasons": [
+          {
+            "code": "WITHIN_MANDATE",
+            "detail": "$26.60 is inside every limit of the mandate."
+          }
+        ]
+      },
+      "createdAt": "2026-10-31T16:14:14.821Z",
+      "updatedAt": "2026-10-31T16:20:46.144Z",
+      "log": [
+        {
+          "at": "2026-10-31T16:14:14.821Z",
+          "event": "proposed",
+          "note": "UYN's Trekking 2In Merino Socks are pure merino, designed for trekking, and priced well under $40, making them a warm, high‑quality gift."
+        },
+        {
+          "at": "2026-10-31T16:14:14.822Z",
+          "event": "policy_approved",
+          "note": "$26.60 is inside every limit of the mandate."
+        },
+        {
+          "at": "2026-10-31T16:14:18.064Z",
+          "event": "order_created",
+          "note": "PayPal order 16P00004KX3620609, intent AUTHORIZE, funded by the sandbox test card"
+        },
+        {
+          "at": "2026-10-31T16:14:18.064Z",
+          "event": "buyer_approved_and_authorized",
+          "note": "Authorization 5J25398002020670Y"
+        },
+        {
+          "at": "2026-10-31T16:20:46.144Z",
+          "event": "voided"
+        }
+      ],
+      "approvedBy": "policy",
+      "orderId": "16P00004KX3620609",
+      "authorizationId": "5J25398002020670Y"
+    }
+  ]
+}

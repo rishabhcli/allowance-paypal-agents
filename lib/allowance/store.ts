@@ -65,6 +65,9 @@ export const DEFAULT_MANDATES: Mandate[] = [
   },
 ];
 
+// A fresh deployment (or a cleared state file) starts from real history recorded with scripts/seed-demo.mjs.
+const SEED = path.join(process.cwd(), 'data', 'seed-state.json');
+
 function fileMtime(): number {
   if (MEMORY_ONLY) return 0;
   try {
@@ -74,6 +77,17 @@ function fileMtime(): number {
   }
 }
 
+function seedState(): State {
+  if (!MEMORY_ONLY && process.env.ALLOWANCE_SEED !== 'off') {
+    try {
+      return JSON.parse(fs.readFileSync(SEED, 'utf8')) as State;
+    } catch {
+      /* no seed file */
+    }
+  }
+  return { mandates: structuredClone(DEFAULT_MANDATES), purchases: [] };
+}
+
 function load(): State {
   const mtime = fileMtime();
   if (cache.state && (MEMORY_ONLY || mtime === cache.mtime)) return cache.state;
@@ -81,7 +95,7 @@ function load(): State {
     if (MEMORY_ONLY) throw new Error('memory');
     cache.state = JSON.parse(fs.readFileSync(FILE, 'utf8')) as State;
   } catch {
-    cache.state = cache.state ?? { mandates: structuredClone(DEFAULT_MANDATES), purchases: [] };
+    cache.state = cache.state ?? seedState();
   }
   cache.mtime = mtime;
   return cache.state;
@@ -125,7 +139,8 @@ export function touch(p: Purchase, event: string, note?: string) {
   save();
 }
 
+/** Back to the recorded seed history (or empty when there is none). */
 export function resetState() {
-  cache.state = { mandates: structuredClone(DEFAULT_MANDATES), purchases: [] };
+  cache.state = seedState();
   save();
 }
