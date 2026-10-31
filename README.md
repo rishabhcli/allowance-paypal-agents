@@ -13,7 +13,7 @@ Built for the PayPal AI Hackathon. PayPal sandbox only, no real money moves.
 | | |
 |---|---|
 | Hosted demo | https://allowance-paypal-agents.vercel.app (state is kept in a private Vercel Blob) |
-| Video | linked on the Devpost submission |
+| Video | `demo/allowance-demo.mp4` (2:28), also linked on the Devpost submission |
 | License | MIT |
 
 ![Approvals](docs/approvals.png)

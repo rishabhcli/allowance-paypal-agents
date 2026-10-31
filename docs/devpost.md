@@ -52,6 +52,7 @@ No other sponsor tools are used.
 
 - gpt-oss-120b on Fireworks: the shopping agent and the AG Studio assistant (including the treasurer).
 - Claude Code (Anthropic) was used to write and test the code in this repository.
+- The narration in the demo video is synthesized speech from ElevenLabs. The footage is a real run against the hosted app.
 
 ### What the ablation shows
 
@@ -105,8 +106,15 @@ Everything uses the PayPal sandbox and no real money moves. Agent runs on the ho
 
 ## Suggested images (in this order)
 
+Files are in `/Users/m3-max/.aside/u/0/sessions/2026-10-30_emTY53cqFCUl1edQ/tmp/allowance-shots/` (also regenerable with `demo/record.mjs`).
+
 1. `01-agent-run.png` the agent run with its steps
 2. `02-waiting-for-you.png` the approvals queue
 3. `05-dashboard-spend.png` the AG Studio report
 4. `08-treasurer-pauses-agent.png` the treasurer agent
 5. `09-ablation.png` the ablation numbers
+6. `04-approved-and-captured.png` a held purchase approved and another captured (optional)
+
+## Video
+
+`demo/allowance-demo.mp4` in the repo, 2:28, 1920x1080. It shows an agent errand, the policy decision, the approvals queue (approve and capture), the AG Studio report, the treasurer agent pausing a mandate, and the ablation numbers. It says plainly that funding is a sandbox test card and that the wallet path is implemented but not exercised.
