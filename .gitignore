@@ -42,3 +42,7 @@ next-env.d.ts
 
 # local state
 .data/
+
+# demo recording scratch
+demo/raw/
+demo/video-only.mp4

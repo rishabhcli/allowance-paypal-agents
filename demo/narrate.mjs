@@ -6,8 +6,10 @@ import { execFileSync } from 'node:child_process';
 const env = Object.fromEntries(fs.readFileSync(os.homedir() + '/Documents/GitHub/temp/.env', 'utf8').split('\n').filter((l) => /^[A-Z_0-9]+=/.test(l)).map((l) => { const i = l.indexOf('='); return [l.slice(0, i), l.slice(i + 1).replace(/^"|"$/g, '')]; }));
 const segs = JSON.parse(fs.readFileSync('demo/narration.json', 'utf8'));
 console.log('characters:', segs.reduce((n, s) => n + s.text.length, 0));
-const durations = {};
+const durations = fs.existsSync('demo/audio/durations.json') ? JSON.parse(fs.readFileSync('demo/audio/durations.json', 'utf8')) : {};
+const only = process.env.ONLY;
 for (const s of segs) {
+  if (only && s.id !== only) continue;
   const res = await fetch('https://api.elevenlabs.io/v1/text-to-speech/s3TPKV1kjDlVtZbl4Ksh?output_format=mp3_44100_128', {
     method: 'POST',
     headers: { 'xi-api-key': env.ELEVENLABS_API_KEY, 'Content-Type': 'application/json' },

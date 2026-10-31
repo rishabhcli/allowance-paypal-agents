@@ -44,9 +44,8 @@ const mandatesApi = async () => (await fetch(BASE + '/api/mandates')).json();
 // Warm the serverless functions while the title card shows.
 void Promise.all(['/', '/dashboard', '/api/mandates', '/api/purchases'].map((p) => fetch(BASE + p).catch(() => null)));
 await page.setContent(title);
-await sleep(5500);
-await page.setContent(flow);
-await sleep(9500);
+await sleep(4000);
+await segment('s0', async () => { await page.setContent(flow); }, 1.5);
 
 await page.goto(BASE + '/', { waitUntil: 'networkidle' });
 await sleep(800);
