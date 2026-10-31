@@ -88,7 +88,26 @@ function seedState(): State {
   return { mandates: structuredClone(DEFAULT_MANDATES), purchases: [] };
 }
 
+// On Vercel, serverless instances do not share a disk, so the hosted demo keeps its state in a private Vercel Blob
+// (ALLOWANCE_REMOTE=blob). Handlers call hydrate() before reading and persist() after writing. Locally both are no-ops.
+const REMOTE = process.env.ALLOWANCE_REMOTE === 'blob' && Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+const REMOTE_PATH = 'allowance/state.json';
+
+export async function hydrate(): Promise<void> {
+  if (!REMOTE) return;
+  const { get } = await import('@vercel/blob');
+  const result = await get(REMOTE_PATH, { access: 'private', useCache: false });
+  cache.state = result && result.statusCode === 200 ? (JSON.parse(await new Response(result.stream).text()) as State) : seedState();
+}
+
+export async function persist(): Promise<void> {
+  if (!REMOTE) return;
+  const { put } = await import('@vercel/blob');
+  await put(REMOTE_PATH, JSON.stringify(load()), { access: 'private', allowOverwrite: true, addRandomSuffix: false, contentType: 'application/json' });
+}
+
 function load(): State {
+  if (REMOTE) return (cache.state ??= seedState());
   const mtime = fileMtime();
   if (cache.state && (MEMORY_ONLY || mtime === cache.mtime)) return cache.state;
   try {
@@ -102,7 +121,7 @@ function load(): State {
 }
 
 function save() {
-  if (MEMORY_ONLY) return;
+  if (MEMORY_ONLY || REMOTE) return;
   try {
     fs.mkdirSync(path.dirname(FILE), { recursive: true });
     fs.writeFileSync(FILE, JSON.stringify(cache.state, null, 2));
