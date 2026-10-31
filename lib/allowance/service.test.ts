@@ -4,6 +4,7 @@
 process.env.ALLOWANCE_STATE_FILE = 'memory';
 process.env.PAYPAL_CLIENT_ID = 'test-id';
 process.env.PAYPAL_SECRET = 'test-secret';
+process.env.PAYPAL_WEBHOOK_ID = 'WH-TEST';
 
 import assert from 'node:assert/strict';
 import { beforeEach, test } from 'node:test';
@@ -36,6 +37,7 @@ globalThis.fetch = (async (input: any, init: any = {}) => {
   if (authorize) {
     return json({ id: authorize[1], status: 'COMPLETED', purchase_units: [{ payments: { authorizations: [{ id: `AUTH-W-${authorize[1]}`, status: 'CREATED', amount: { value: '0', currency_code: 'USD' } }] } }] });
   }
+  if (path === '/v1/notifications/verify-webhook-signature') return json({ verification_status: body.transmission_id === 'good' ? 'SUCCESS' : 'FAILURE' });
   if (path.endsWith('/capture')) return json({ id: `CAP-${++seq}`, status: 'COMPLETED', amount: body.amount });
   if (path.endsWith('/void')) return new Response(null, { status: 204 });
   return json({ error: 'unmocked ' + path }, 404);
@@ -44,6 +46,7 @@ globalThis.fetch = (async (input: any, init: any = {}) => {
 const store = await import('./store.ts');
 const service = await import('./service.ts');
 const { runAgent } = await import('./agent.ts');
+const webhook = await import('./webhook.ts');
 
 const input = (over: Record<string, unknown> = {}) => ({
   mandateId: 'gift-finder',
@@ -188,4 +191,28 @@ test('an over-limit proposal from the agent is held for a human and the agent is
   assert.equal(run.purchases[0].status, 'awaiting_human');
   assert.match(seen.join(' '), /needs_human/);
   assert.equal(calls.length, 0);
+});
+
+// ---- Webhooks --------------------------------------------------------------------------------
+
+test('webhook signatures are checked with PayPal, and a bad one is refused', async () => {
+  const event = { id: 'WH-1', event_type: 'PAYMENT.CAPTURE.COMPLETED', resource: {} };
+  assert.equal(await webhook.verifySignature(new Headers({ 'paypal-transmission-id': 'good' }), event), true);
+  assert.equal(await webhook.verifySignature(new Headers({ 'paypal-transmission-id': 'forged' }), event), false);
+  delete process.env.PAYPAL_WEBHOOK_ID;
+  assert.equal(await webhook.verifySignature(new Headers({ 'paypal-transmission-id': 'good' }), event), false);
+  process.env.PAYPAL_WEBHOOK_ID = 'WH-TEST';
+});
+
+test('a void done outside the app is reconciled from the webhook, and a capture event is idempotent', async () => {
+  const a = await service.submitProposal(input());
+  webhook.applyEvent({ id: 'E1', event_type: 'PAYMENT.AUTHORIZATION.VOIDED', resource: { id: a.authorizationId } });
+  assert.equal(a.status, 'voided');
+  const b = await service.submitProposal(input({ productId: 'P3' }));
+  const capEvent = { id: 'E2', event_type: 'PAYMENT.CAPTURE.COMPLETED', resource: { id: 'CAP-X', supplementary_data: { related_ids: { authorization_id: b.authorizationId } } } };
+  webhook.applyEvent(capEvent);
+  webhook.applyEvent(capEvent);
+  assert.equal(b.status, 'captured');
+  assert.equal(b.log.filter((l) => l.event === 'webhook:capture_completed').length, 1);
+  assert.equal(webhook.applyEvent({ id: 'E3', event_type: 'PAYMENT.CAPTURE.COMPLETED', resource: { id: 'C', supplementary_data: { related_ids: { authorization_id: 'unknown' } } } }), undefined);
 });
