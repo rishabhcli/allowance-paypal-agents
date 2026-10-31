@@ -12,7 +12,7 @@ Built for the PayPal AI Hackathon. PayPal sandbox only, no real money moves.
 
 | | |
 |---|---|
-| Hosted demo | https://allowance-paypal-agents.vercel.app (state lives in the serverless instance and resets on a cold start) |
+| Hosted demo | https://allowance-paypal-agents.vercel.app (state is kept in a private Vercel Blob) |
 | Video | linked on the Devpost submission |
 | License | MIT |
 
@@ -138,10 +138,11 @@ person. Search results vary between runs, so exact items differ.
 - Funding in the demo is a PayPal sandbox test card, a stand in for a card an agent holds. A buyer approving at PayPal
   with a sandbox personal account (the wallet path) is implemented but was not exercised, because no sandbox buyer login
   was available.
-- Webhook handling is covered by tests with a mocked verification call. A real delivery needs the hosted URL registered
-  as a webhook.
+- Webhooks: a real `PAYMENT.CAPTURE.COMPLETED` event from the sandbox was delivered to the hosted app, verified with
+  PayPal's signature endpoint and recorded in the purchase's audit log. The handler logic is also covered by tests.
 - PayPal's own agentic commerce products were not used: they are invite only.
-- Hosted state is per serverless instance and resets on a cold start; local runs persist to `.data/state.json`.
+- Hosted state lives in one JSON blob that handlers read before and write after each request. Two simultaneous writes
+  would race (last one wins), which is fine for a demo and not for production. Local runs persist to `.data/state.json`.
 - The AG Studio licence is a 45 day trial.
 
 ## Credits
