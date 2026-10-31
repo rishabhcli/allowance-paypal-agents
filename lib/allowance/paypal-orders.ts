@@ -28,6 +28,8 @@ export type CreateOrderInput = {
   currency: string;
   returnUrl: string;
   cancelUrl: string;
+  /** Distinguishes one user initiated attempt from the next. PayPal refuses a replayed Request-Id on a card order. */
+  attempt?: string;
 };
 
 /** Step 1. intent=AUTHORIZE holds funds later instead of taking them now. Returns the order and the PayPal approval URL. */
@@ -57,7 +59,7 @@ export async function createAuthorizeOrder(input: CreateOrderInput) {
         },
       },
     },
-    { requestId: `allowance-order-${input.proposalId}` },
+    { requestId: `allowance-order-${input.proposalId}-${input.attempt ?? ''}` },
   );
   const approveUrl = order.links?.find((l) => l.rel === 'payer-action' || l.rel === 'approve')?.href;
   return { order, approveUrl };
@@ -126,7 +128,7 @@ export async function createCardAuthorization(input: Omit<CreateOrderInput, 'ret
       ],
       payment_source: { card: testCard() },
     },
-    { requestId: `allowance-card-order-${input.proposalId}` },
+    { requestId: `allowance-card-order-${input.proposalId}-${input.attempt ?? ''}` },
   );
   const authorization = order.purchase_units?.[0]?.payments?.authorizations?.[0];
   if (!authorization) throw new Error(`Card order ${order.id} was not authorized (status ${order.status})`);

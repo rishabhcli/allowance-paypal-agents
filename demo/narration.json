@@ -1,0 +1,9 @@
+[
+  { "id": "s1", "text": "AI agents that buy things need limits the model cannot argue with. Allowance gives each agent a mandate: a cap per purchase, an amount it may spend alone, and a daily budget." },
+  { "id": "s2", "text": "I give the gift finder an errand. It searches real products through Channel3, and a Fireworks model picks one. Policy approves this small purchase, and PayPal places a sandbox authorization hold." },
+  { "id": "s3", "text": "Larger purchases wait here for a person. Anything over the cap is denied before PayPal is called, like this twenty seven thousand dollar watch. I approve the held blanket and capture the socks." },
+  { "id": "s4", "text": "The dashboard is an AG Studio report over the same data: spend, limits, and an audit trail." },
+  { "id": "s5", "text": "A treasurer agent inside Studio manages mandates. I ask it to pause the office agent, and it does. Raising a limit needs a person to confirm." },
+  { "id": "s6", "text": "Without the policy engine, the same agent authorized over twenty seven thousand dollars. With it, under sixty." },
+  { "id": "s7", "text": "Funding here is a PayPal sandbox test card. The wallet approval path is implemented but not exercised." }
+]

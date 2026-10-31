@@ -45,6 +45,8 @@ function move(p: Purchase, event: PurchaseEvent, note?: string) {
 const funding = () => (process.env.PAYPAL_FUNDING === 'wallet' ? 'wallet' : 'card');
 
 async function openOrder(p: Purchase) {
+  // Retries inside one call reuse the same key (idempotent); a new approval after a failure gets a new one.
+  const attempt = Date.now().toString(36);
   if (funding() === 'card') {
     const { order, authorizationId } = await createCardAuthorization({
       proposalId: p.id,
@@ -52,6 +54,7 @@ async function openOrder(p: Purchase) {
       merchant: p.merchant,
       amountCents: p.amountCents,
       currency: p.currency,
+      attempt,
     });
     p.orderId = order.id;
     store.touch(p, 'order_created', `PayPal order ${order.id}, intent AUTHORIZE, funded by the sandbox test card`);
@@ -67,6 +70,7 @@ async function openOrder(p: Purchase) {
     currency: p.currency,
     returnUrl: `${baseUrl()}/api/paypal/return?purchase=${p.id}`,
     cancelUrl: `${baseUrl()}/api/paypal/cancel?purchase=${p.id}`,
+    attempt,
   });
   p.orderId = order.id;
   p.approveUrl = approveUrl;
