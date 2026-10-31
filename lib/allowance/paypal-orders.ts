@@ -94,3 +94,41 @@ export async function voidAuthorization(authorizationId: string) {
 }
 
 export const getOrder = (orderId: string) => paypalRequest<PayPalOrder>('GET', `/v2/checkout/orders/${orderId}`);
+
+// Sandbox test card used as the agent's funding source (see README). Override with SANDBOX_TEST_CARD_* if needed.
+const testCard = () => ({
+  number: process.env.SANDBOX_TEST_CARD_NUMBER ?? '4111111111111111',
+  expiry: process.env.SANDBOX_TEST_CARD_EXPIRY ?? '2030-12',
+  security_code: process.env.SANDBOX_TEST_CARD_CVV ?? '123',
+  name: 'Allowance Sandbox Buyer',
+  billing_address: { address_line_1: '1 Main St', admin_area_2: 'San Jose', admin_area_1: 'CA', postal_code: '95131', country_code: 'US' },
+  attributes: { verification: { method: 'SCA_WHEN_REQUIRED' } },
+});
+
+/**
+ * Sandbox shortcut for a funding instrument the agent holds (a card on file). One call creates the
+ * order and authorizes it, so no buyer has to log in. The money still only moves at capture.
+ * The wallet path above (createAuthorizeOrder, buyer approval, authorizeOrder) is the real-buyer flow.
+ */
+export async function createCardAuthorization(input: Omit<CreateOrderInput, 'returnUrl' | 'cancelUrl'>) {
+  const order = await paypalRequest<PayPalOrder>(
+    'POST',
+    '/v2/checkout/orders',
+    {
+      intent: 'AUTHORIZE',
+      purchase_units: [
+        {
+          reference_id: input.proposalId,
+          custom_id: input.proposalId,
+          description: `${input.title} from ${input.merchant}`.slice(0, 127),
+          amount: { currency_code: input.currency, value: toDecimalString(input.amountCents) },
+        },
+      ],
+      payment_source: { card: testCard() },
+    },
+    { requestId: `allowance-card-order-${input.proposalId}` },
+  );
+  const authorization = order.purchase_units?.[0]?.payments?.authorizations?.[0];
+  if (!authorization) throw new Error(`Card order ${order.id} was not authorized (status ${order.status})`);
+  return { order, authorizationId: authorization.id };
+}

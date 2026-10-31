@@ -2,7 +2,13 @@
 // the policy asks for one, PayPal authorization only after that, capture or void last.
 
 import { randomUUID } from 'node:crypto';
-import { authorizeOrder, captureAuthorization, createAuthorizeOrder, voidAuthorization } from './paypal-orders.ts';
+import {
+  authorizeOrder,
+  captureAuthorization,
+  createAuthorizeOrder,
+  createCardAuthorization,
+  voidAuthorization,
+} from './paypal-orders.ts';
 import { COMMITTED, evaluate, next, type PurchaseEvent, type Proposal, type Spend } from './policy.ts';
 import * as store from './store.ts';
 import type { Purchase } from './store.ts';
@@ -35,7 +41,24 @@ function move(p: Purchase, event: PurchaseEvent, note?: string) {
   store.touch(p, event, note);
 }
 
+/** 'card' (default) authorizes with a sandbox test card in one call. 'wallet' stops at the PayPal approval URL for a real buyer. */
+const funding = () => (process.env.PAYPAL_FUNDING === 'wallet' ? 'wallet' : 'card');
+
 async function openOrder(p: Purchase) {
+  if (funding() === 'card') {
+    const { order, authorizationId } = await createCardAuthorization({
+      proposalId: p.id,
+      title: p.title,
+      merchant: p.merchant,
+      amountCents: p.amountCents,
+      currency: p.currency,
+    });
+    p.orderId = order.id;
+    store.touch(p, 'order_created', `PayPal order ${order.id}, intent AUTHORIZE, funded by the sandbox test card`);
+    p.authorizationId = authorizationId;
+    move(p, 'buyer_approved_and_authorized', `Authorization ${authorizationId}`);
+    return;
+  }
   const { order, approveUrl } = await createAuthorizeOrder({
     proposalId: p.id,
     title: p.title,

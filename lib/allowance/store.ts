@@ -33,7 +33,9 @@ export type Purchase = {
 
 type State = { mandates: Mandate[]; purchases: Purchase[] };
 
-const FILE = path.join(process.cwd(), '.data', 'state.json');
+// ALLOWANCE_STATE_FILE=memory keeps everything in memory (used by the tests).
+const FILE = process.env.ALLOWANCE_STATE_FILE ?? path.join(process.cwd(), '.data', 'state.json');
+const MEMORY_ONLY = FILE === 'memory';
 let state: State | undefined;
 
 export const DEFAULT_MANDATES: Mandate[] = [
@@ -63,6 +65,7 @@ export const DEFAULT_MANDATES: Mandate[] = [
 function load(): State {
   if (state) return state;
   try {
+    if (MEMORY_ONLY) throw new Error('memory');
     state = JSON.parse(fs.readFileSync(FILE, 'utf8')) as State;
   } catch {
     state = { mandates: structuredClone(DEFAULT_MANDATES), purchases: [] };
@@ -71,6 +74,7 @@ function load(): State {
 }
 
 function save() {
+  if (MEMORY_ONLY) return;
   try {
     fs.mkdirSync(path.dirname(FILE), { recursive: true });
     fs.writeFileSync(FILE, JSON.stringify(state, null, 2));

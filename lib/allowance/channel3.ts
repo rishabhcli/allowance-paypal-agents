@@ -16,15 +16,13 @@ export type Candidate = {
   imageUrl?: string;
 };
 
-type RawOffer = { domain?: string; price?: { amount?: number; currency?: string }; availability?: string; url?: string };
+type RawOffer = { domain?: string; price?: { price?: number; currency?: string }; availability?: string; url?: string };
 type RawProduct = {
   id?: string;
   title?: string;
-  brand_name?: string;
   brands?: { name?: string }[];
-  categories?: { name?: string }[];
-  image_url?: string;
-  images?: { url?: string }[];
+  category?: { title?: string };
+  images?: { url?: string; is_main_image?: boolean }[];
   offers?: RawOffer[];
 };
 
@@ -33,19 +31,19 @@ export function flattenProducts(products: RawProduct[]): Candidate[] {
   for (const p of products) {
     if (!p.id || !p.title) continue;
     for (const offer of p.offers ?? []) {
-      const amount = offer.price?.amount;
+      const amount = offer.price?.price;
       if (!offer.domain || typeof amount !== 'number' || !offer.url) continue;
       if (offer.availability && offer.availability !== 'InStock') continue;
       out.push({
         productId: p.id,
         title: p.title,
-        brand: p.brand_name ?? p.brands?.[0]?.name,
+        brand: p.brands?.[0]?.name,
         merchant: offer.domain,
-        category: p.categories?.[0]?.name,
+        category: p.category?.title,
         priceCents: Math.round(amount * 100),
         currency: offer.price?.currency ?? 'USD',
         buyUrl: offer.url,
-        imageUrl: p.image_url ?? p.images?.[0]?.url,
+        imageUrl: (p.images?.find((i) => i.is_main_image) ?? p.images?.[0])?.url,
       });
     }
   }
