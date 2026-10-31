@@ -3,7 +3,7 @@
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 const FF = '/opt/homebrew/bin/ffmpeg';
-const { marks, video } = JSON.parse(fs.readFileSync('demo/marks.json', 'utf8'));
+const { marks, video, total: scriptTotal } = JSON.parse(fs.readFileSync('demo/marks.json', 'utf8'));
 const dur = JSON.parse(fs.readFileSync('demo/audio/durations.json', 'utf8'));
 const ids = Object.keys(marks);
 const probe = (f) => Number(execFileSync('/opt/homebrew/bin/ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', f]).toString().trim());
@@ -11,7 +11,8 @@ const probe = (f) => Number(execFileSync('/opt/homebrew/bin/ffprobe', ['-v', 'er
 execFileSync(FF, ['-y', '-i', video, '-vf', 'fps=30,scale=1920:1080:flags=lanczos,format=yuv420p', '-c:v', 'libx264', '-preset', 'medium', '-crf', '20', '-an', 'demo/video-only.mp4'], { stdio: 'ignore' });
 const videoDur = probe('demo/video-only.mp4');
 const lastEnd = Math.max(...ids.map((id) => marks[id] + dur[id])) + 1;
-const total = Math.max(videoDur, lastEnd);
+// The recording keeps a frozen frame after the last action; cut to the script clock (video time matches it).
+const total = Math.max(lastEnd, Math.min(videoDur, scriptTotal));
 
 const inputs = ['-i', 'demo/video-only.mp4', ...ids.flatMap((id) => ['-i', `demo/audio/${id}.mp3`])];
 const delays = ids.map((id, i) => `[${i + 1}:a]adelay=${Math.round(marks[id] * 1000)}|${Math.round(marks[id] * 1000)}[a${i}]`);

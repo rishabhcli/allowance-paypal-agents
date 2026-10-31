@@ -32,9 +32,11 @@ await context.addInitScript(() => {
 const page = await context.newPage();
 T0 = Date.now();
 page.on('dialog', (d) => d.accept());
+page.on('response', async (res) => { if (res.url().includes('/api/purchases/') || res.url().includes('/api/agent')) console.log('API', res.request().method(), res.status(), (await res.text().catch(() => '')).slice(0, 140).replace(/\n/g, ' ')); });
 const shot = (name) => page.screenshot({ path: `${SHOTS}/${name}.png` });
 const smooth = (y) => page.evaluate((top) => window.scrollTo({ top, behavior: 'smooth' }), y);
-async function center(loc) { await loc.scrollIntoViewIfNeeded(); const b = await loc.boundingBox(); await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2, { steps: 20 }); await sleep(300); }
+async function settle() { let last = -1; for (let i = 0; i < 25; i++) { const y = await page.evaluate(() => window.scrollY); if (y === last) return; last = y; await sleep(200); } }
+async function center(loc) { await loc.scrollIntoViewIfNeeded(); await settle(); const b = await loc.boundingBox(); await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2, { steps: 20 }); await sleep(300); }
 async function click(loc) { await center(loc); await page.mouse.down(); await page.mouse.up(); }
 async function segment(id, fn, tail = 1.2) { const start = now(); marks[id] = start; await fn(start); await until(start + dur[id] + tail); }
 const mandatesApi = async () => (await fetch(BASE + '/api/mandates')).json();
@@ -92,10 +94,20 @@ await segment('s3', async (start) => {
   await until(start + 9.5);
   await smooth(380);
   await sleep(1200);
-  await click(page.getByRole('button', { name: 'Approve and authorize' }).first());
-  await sleep(3500);
-  await click(page.getByRole('button', { name: /^Capture \$/ }).first());
-  await sleep(3500);
+  const approve = page.getByRole('button', { name: 'Approve and authorize' });
+  const before = await approve.count();
+  for (let attempt = 0; attempt < 2; attempt++) {
+    await click(approve.first());
+    for (let i = 0; i < 16; i++) { await sleep(500); if ((await approve.count()) < before) break; }
+    if ((await approve.count()) < before) break;
+    console.log('approve did not register, retrying');
+  }
+  await sleep(2500);
+  const capture = page.getByRole('button', { name: /^Capture \$/ });
+  const holds = await capture.count();
+  await click(capture.first());
+  for (let i = 0; i < 24; i++) { await sleep(500); if ((await capture.count()) < holds) break; }
+  await sleep(2500);
   await shot('04-approved-and-captured');
 }, 1.5);
 

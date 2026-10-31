@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { hydrate, persist } from '@/lib/allowance/store';
 import { capture, completeBuyerApproval, humanDecide, voidPurchase } from '@/lib/allowance/service';
 
 // One endpoint for everything a person can do to a purchase: approve, reject, capture, void.
@@ -7,7 +6,6 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
   const { id } = await ctx.params;
   const { action, finalCents } = (await req.json()) as { action?: string; finalCents?: number };
   try {
-    await hydrate();
     switch (action) {
       case 'approve':
         return await done(await humanDecide(id, 'approve'));
@@ -28,6 +26,5 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
 }
 
 async function done(purchase: unknown) {
-  await persist();
   return NextResponse.json(purchase);
 }

@@ -78,7 +78,8 @@ async function openOrder(p: Purchase) {
 }
 
 /** An agent proposes a purchase. Returns the stored purchase with the policy decision applied. */
-export async function submitProposal(input: ProposalInput, now = new Date()): Promise<Purchase> {
+export const submitProposal = (input: ProposalInput, now = new Date()): Promise<Purchase> => store.locked(() => submitProposalUnlocked(input, now));
+async function submitProposalUnlocked(input: ProposalInput, now: Date): Promise<Purchase> {
   const mandate = store.getMandate(input.mandateId);
   if (!mandate) throw new Error(`No mandate ${input.mandateId}`);
   const proposal: Proposal = { id: randomUUID(), ...input };
@@ -117,7 +118,8 @@ export async function submitProposal(input: ProposalInput, now = new Date()): Pr
 }
 
 /** A person answers a purchase the policy held for them. */
-export async function humanDecide(id: string, verdict: 'approve' | 'reject'): Promise<Purchase> {
+export const humanDecide = (id: string, verdict: 'approve' | 'reject'): Promise<Purchase> => store.locked(() => humanDecideUnlocked(id, verdict));
+async function humanDecideUnlocked(id: string, verdict: 'approve' | 'reject'): Promise<Purchase> {
   const p = store.getPurchase(id);
   if (!p) throw new Error(`No purchase ${id}`);
   if (verdict === 'reject') {
@@ -131,7 +133,8 @@ export async function humanDecide(id: string, verdict: 'approve' | 'reject'): Pr
 }
 
 /** The buyer came back from PayPal approved: authorize the order, which places the hold. */
-export async function completeBuyerApproval(id: string): Promise<Purchase> {
+export const completeBuyerApproval = (id: string): Promise<Purchase> => store.locked(() => completeBuyerApprovalUnlocked(id));
+async function completeBuyerApprovalUnlocked(id: string): Promise<Purchase> {
   const p = store.getPurchase(id);
   if (!p?.orderId) throw new Error(`Purchase ${id} has no PayPal order`);
   const { authorizationId } = await authorizeOrder(p.orderId);
@@ -141,7 +144,8 @@ export async function completeBuyerApproval(id: string): Promise<Purchase> {
 }
 
 /** Take the money. A final amount below the authorized one is allowed, above it is not. */
-export async function capture(id: string, finalCents?: number): Promise<Purchase> {
+export const capture = (id: string, finalCents?: number): Promise<Purchase> => store.locked(() => captureUnlocked(id, finalCents));
+async function captureUnlocked(id: string, finalCents?: number): Promise<Purchase> {
   const p = store.getPurchase(id);
   if (!p?.authorizationId) throw new Error(`Purchase ${id} is not authorized`);
   const amount = finalCents ?? p.amountCents;
@@ -153,7 +157,8 @@ export async function capture(id: string, finalCents?: number): Promise<Purchase
   return p;
 }
 
-export async function voidPurchase(id: string): Promise<Purchase> {
+export const voidPurchase = (id: string): Promise<Purchase> => store.locked(() => voidPurchaseUnlocked(id));
+async function voidPurchaseUnlocked(id: string): Promise<Purchase> {
   const p = store.getPurchase(id);
   if (!p?.authorizationId) throw new Error(`Purchase ${id} is not authorized`);
   await voidAuthorization(p.authorizationId);

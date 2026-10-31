@@ -93,6 +93,27 @@ function seedState(): State {
 const REMOTE = process.env.ALLOWANCE_REMOTE === 'blob' && Boolean(process.env.BLOB_READ_WRITE_TOKEN);
 const REMOTE_PATH = 'allowance/state.json';
 
+// One request at a time per instance may read-modify-write the state. Without this, a polling GET that calls hydrate()
+// while a POST is waiting on PayPal swaps the cached state object, and the POST then persists a copy without its change.
+let chain: Promise<unknown> = Promise.resolve();
+export function exclusive<T>(fn: () => Promise<T>): Promise<T> {
+  const run = chain.then(fn, fn);
+  chain = run.then(() => undefined, () => undefined);
+  return run;
+}
+
+/** Hydrate, run, persist, all inside the lock. Persist even when fn throws so partial changes are not lost. */
+export function locked<T>(fn: () => Promise<T>): Promise<T> {
+  return exclusive(async () => {
+    await hydrate();
+    try {
+      return await fn();
+    } finally {
+      await persist();
+    }
+  });
+}
+
 export async function hydrate(): Promise<void> {
   if (!REMOTE) return;
   const { get } = await import('@vercel/blob');

@@ -1,7 +1,7 @@
 // What the AG Studio dashboard reads: flat rows built from the Allowance store (mandates, purchases
 // and their audit events). Money is in dollars here because that is what Studio formats.
 
-import { hydrate, purchases as allPurchases, mandates as allMandates, type Purchase } from './allowance/store.ts';
+import { exclusive, hydrate, purchases as allPurchases, mandates as allMandates, type Purchase } from './allowance/store.ts';
 
 export type MandateRow = {
   id: string;
@@ -112,7 +112,7 @@ export function purchaseRow(p: Purchase): PurchaseRow {
 }
 
 export async function getDashboardData(): Promise<DashboardData> {
-  await hydrate();
+  await exclusive(hydrate);
   const purchases = allPurchases();
   const now = Date.now();
   const mandates: MandateRow[] = allMandates().map((m) => {
