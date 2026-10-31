@@ -27,6 +27,7 @@ export type PurchaseRow = {
   committed: number; // authorized or captured, minus the part never captured
   captured: number;
   waiting: number; // held for a person
+  exposure: number; // committed plus waiting: real money or money a person still has to decide on
   stopped: number; // denied by policy or rejected by a person
   one: number;
   isAuto: number;
@@ -97,6 +98,7 @@ export function purchaseRow(p: Purchase): PurchaseRow {
     committed: dollars(committedCents),
     captured: dollars(status === 'captured' ? (p.capturedCents ?? p.amountCents) : 0),
     waiting: dollars(status === 'awaiting_human' ? p.amountCents : 0),
+    exposure: dollars(committedCents + (status === 'awaiting_human' ? p.amountCents : 0)),
     stopped: dollars(stopped ? p.amountCents : 0),
     one: 1,
     isAuto: p.approvedBy === 'policy' ? 1 : 0,

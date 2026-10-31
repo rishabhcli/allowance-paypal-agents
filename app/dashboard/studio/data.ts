@@ -80,6 +80,7 @@ export function buildStudioData(data: DashboardData): AgDataSourcesDefinition {
           ['committed', 'Committed', 'currencyFormat'],
           ['captured', 'Captured', 'currencyFormat'],
           ['waiting', 'Waiting for a Person', 'currencyFormat'],
+          ['exposure', 'Approved or Waiting', 'currencyFormat'],
           ['stopped', 'Stopped', 'currencyFormat'],
           ['one', 'Purchases', 'integerFormat', true],
           ['isAuto', 'Auto Approved Flag', 'integerFormat', true],

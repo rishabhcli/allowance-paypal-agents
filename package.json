@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "node --test lib/allowance/*.test.ts",
-    "demo": "node --env-file=.env.local scripts/live-demo.ts"
+    "demo": "node --env-file=.env.local scripts/live-demo.ts",
+    "seed": "node scripts/seed-demo.mjs"
   },
   "dependencies": {
     "ag-grid-community": "36.2.0",

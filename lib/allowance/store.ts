@@ -36,7 +36,10 @@ type State = { mandates: Mandate[]; purchases: Purchase[] };
 // ALLOWANCE_STATE_FILE=memory keeps everything in memory (used by the tests).
 const FILE = process.env.ALLOWANCE_STATE_FILE ?? path.join(process.cwd(), '.data', 'state.json');
 const MEMORY_ONLY = FILE === 'memory';
-let state: State | undefined;
+// Next can bundle route handlers and pages separately, so share one cache on globalThis and re-read the file when
+// another bundle (or process) has written it.
+const g = globalThis as unknown as { __allowance?: { state?: State; mtime?: number } };
+const cache = (g.__allowance ??= {});
 
 export const DEFAULT_MANDATES: Mandate[] = [
   {
@@ -62,22 +65,34 @@ export const DEFAULT_MANDATES: Mandate[] = [
   },
 ];
 
+function fileMtime(): number {
+  if (MEMORY_ONLY) return 0;
+  try {
+    return fs.statSync(FILE).mtimeMs;
+  } catch {
+    return 0;
+  }
+}
+
 function load(): State {
-  if (state) return state;
+  const mtime = fileMtime();
+  if (cache.state && (MEMORY_ONLY || mtime === cache.mtime)) return cache.state;
   try {
     if (MEMORY_ONLY) throw new Error('memory');
-    state = JSON.parse(fs.readFileSync(FILE, 'utf8')) as State;
+    cache.state = JSON.parse(fs.readFileSync(FILE, 'utf8')) as State;
   } catch {
-    state = { mandates: structuredClone(DEFAULT_MANDATES), purchases: [] };
+    cache.state = cache.state ?? { mandates: structuredClone(DEFAULT_MANDATES), purchases: [] };
   }
-  return state;
+  cache.mtime = mtime;
+  return cache.state;
 }
 
 function save() {
   if (MEMORY_ONLY) return;
   try {
     fs.mkdirSync(path.dirname(FILE), { recursive: true });
-    fs.writeFileSync(FILE, JSON.stringify(state, null, 2));
+    fs.writeFileSync(FILE, JSON.stringify(cache.state, null, 2));
+    cache.mtime = fileMtime();
   } catch {
     /* read-only filesystem: stay in memory */
   }
@@ -111,6 +126,6 @@ export function touch(p: Purchase, event: string, note?: string) {
 }
 
 export function resetState() {
-  state = { mandates: structuredClone(DEFAULT_MANDATES), purchases: [] };
+  cache.state = { mandates: structuredClone(DEFAULT_MANDATES), purchases: [] };
   save();
 }
