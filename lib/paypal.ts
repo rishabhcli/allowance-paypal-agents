@@ -6,13 +6,13 @@ const BASE_URL = 'https://api-m.sandbox.paypal.com';
 const MAX_ATTEMPTS = 4;
 
 export class PayPalApiError extends Error {
-  constructor(
-    readonly status: number,
-    readonly path: string,
-    body: string,
-  ) {
+  readonly status: number;
+  readonly path: string;
+  constructor(status: number, path: string, body: string) {
     super(`PayPal ${status} on ${path}: ${body.slice(0, 300)}`);
-    this.name = 'PayPalApiError';
+    this.name = "PayPalApiError";
+    this.status = status;
+    this.path = path;
   }
 }
 
@@ -220,4 +220,40 @@ export type Balances = {
 
 export function getBalances(): Promise<Balances> {
   return get<Balances>('/v1/reporting/balances');
+}
+
+
+// ---- Write calls (Orders v2 and Payments v2), used by the Allowance purchase flow -----------------
+
+/** One authenticated call with a JSON body. `requestId` becomes PayPal-Request-Id, which makes retries idempotent. */
+export async function paypalRequest<T>(
+  method: "GET" | "POST",
+  path: string,
+  body?: unknown,
+  opts: { requestId?: string; headers?: Record<string, string> } = {},
+): Promise<T> {
+  for (let attempt = 1; ; attempt++) {
+    const res = await fetch(`${BASE_URL}${path}`, {
+      method,
+      headers: {
+        Authorization: `Bearer ${await accessToken()}`,
+        "Content-Type": "application/json",
+        Prefer: "return=representation",
+        ...(opts.requestId ? { "PayPal-Request-Id": opts.requestId } : {}),
+        ...opts.headers,
+      },
+      body: body === undefined ? undefined : JSON.stringify(body),
+      cache: "no-store",
+    });
+    if (res.ok) return (res.status === 204 ? {} : await res.json()) as T;
+    if (res.status === 401 && attempt === 1) {
+      cachedToken = undefined;
+      continue;
+    }
+    if ((res.status === 429 || res.status >= 500) && attempt < MAX_ATTEMPTS) {
+      await new Promise((resolve) => setTimeout(resolve, 2 ** attempt * 250));
+      continue;
+    }
+    throw new PayPalApiError(res.status, path, await res.text());
+  }
 }
