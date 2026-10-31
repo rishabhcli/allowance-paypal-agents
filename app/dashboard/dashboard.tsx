@@ -10,7 +10,8 @@
 // Nothing tracks edits as they happen. Save reads the report from Studio with getState(), and
 // leaving a report compares Studio's state with the saved one there and then.
 
-import { useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   AgStudioAiModule,
   enableStudioDevValidations,
@@ -80,6 +81,13 @@ export function Dashboard(props: DashboardProps) {
 function ReportsDashboard({ data, licenseKey, aiModels }: DashboardProps) {
   const { store, latest, update, editReport } = useReports();
   const apiRef = useRef<AgStudioApi | null>(null);
+  const router = useRouter();
+  // The treasurer agent changes mandates through the API; reload the data it changed.
+  useEffect(() => {
+    const refresh = () => router.refresh();
+    window.addEventListener('allowance:mandates-changed', refresh);
+    return () => window.removeEventListener('allowance:mandates-changed', refresh);
+  }, [router]);
 
   // The open report as it is in Studio now, unsaved edits included, for drawing the shell.
   // Null until Studio is ready.
