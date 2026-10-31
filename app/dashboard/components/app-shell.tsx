@@ -1,37 +1,46 @@
 'use client';
 
+import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { BellIcon, HelpIcon } from './ui/icons';
 import { AgStudioLogo } from './ui/logo';
 
-// The app frame, laid out like the PayPal Developer Dashboard: a white top bar, a left sidebar
-// and a light canvas. Shared by the dashboard, its loading skeleton and its error page.
+// The app frame: a white top bar with the Allowance wordmark and page links, a left sidebar and a light
+// canvas. Shared by the dashboard, its loading skeleton and its error page.
 
-function PayPalWordmark({ className = '' }: { className?: string }) {
+function Wordmark() {
   return (
-    <span className={`font-bold italic tracking-tight ${className}`}>
-      <span className="text-pp-blue-dark">Pay</span>
-      <span className="text-pp-sky">Pal</span>
-    </span>
+    <Link href="/" className="flex items-center gap-2 text-pp-navy">
+      <span className="flex size-8 items-center justify-center rounded-lg bg-pp-blue text-base font-bold text-white" aria-hidden>
+        A
+      </span>
+      <span className="text-lg font-semibold tracking-tight">Allowance</span>
+    </Link>
   );
 }
 
-function BrandLockup() {
+const navClass = (on: boolean) => `rounded-full px-3 py-1.5 ${on ? 'bg-pp-highlight text-pp-navy' : 'text-pp-muted hover:bg-pp-highlight hover:text-pp-navy'}`;
+
+function BrandLockup({ active }: { active: 'approvals' | 'dashboard' }) {
   return (
-    <div className="flex items-center gap-3">
-      <AgStudioLogo className="-ml-3 h-12 w-auto" />
+    <div className="flex items-center gap-4">
+      <Wordmark />
       <span className="h-6 w-px bg-pp-border" aria-hidden />
-      <span className="flex items-baseline gap-1 text-xs text-pp-muted">
-        powered by <PayPalWordmark className="text-base" /> APIs
+      <nav className="flex items-center gap-1 text-sm font-semibold" aria-label="Pages">
+        <Link href="/" className={navClass(active === 'approvals')}>Approvals</Link>
+        <Link href="/dashboard" className={navClass(active === 'dashboard')}>Dashboard</Link>
+      </nav>
+      <span className="hidden items-center gap-1 text-xs text-pp-muted md:flex">
+        reports by <AgStudioLogo className="h-9 w-auto" />
       </span>
     </div>
   );
 }
 
-function TopBar() {
+export function TopBar({ active = 'dashboard' }: { active?: 'approvals' | 'dashboard' }) {
   return (
     <header className="flex h-16 shrink-0 items-center gap-6 border-b border-pp-border bg-white px-6">
-      <BrandLockup />
+      <BrandLockup active={active} />
       <div className="ml-auto flex items-center gap-1 text-pp-navy">
         <span className="inline-flex size-9 items-center justify-center rounded-full" title="Help">
           <HelpIcon />
@@ -41,9 +50,9 @@ function TopBar() {
         </span>
         <span className="ml-2 flex items-center gap-2">
           <span className="flex size-9 items-center justify-center rounded-full bg-pp-navy text-sm font-semibold text-white">
-            AG
+            A
           </span>
-          <span className="hidden text-sm font-semibold sm:inline">Demo merchant</span>
+          <span className="hidden text-sm font-semibold sm:inline">Sandbox account</span>
         </span>
       </div>
     </header>

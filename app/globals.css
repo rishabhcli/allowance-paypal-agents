@@ -16,33 +16,33 @@ body {
  * and for AG Grid (app/(endpoints)/data-grid.tsx), whose themes reference these variables directly.
  */
 :root {
-  --pp-navy: #001c64;
-  --pp-blue: #0070e0;
-  --pp-blue-dark: #003087;
-  --pp-sky: #009cde;
-  --pp-highlight: #e6f0fc;
-  --pp-canvas: #f5f7fa;
+  --pp-navy: #0d2b24;
+  --pp-blue: #14705a;
+  --pp-blue-dark: #0d4d3e;
+  --pp-sky: #2fa585;
+  --pp-highlight: #e3f1ec;
+  --pp-canvas: #f6f5f0;
   --pp-surface: #ffffff;
-  --pp-border: #dbe1e8;
-  --pp-gridline: #e9edf2;
-  --pp-ink: #001435;
-  --pp-muted: #545d68;
+  --pp-border: #dcd9cf;
+  --pp-gridline: #ebe8df;
+  --pp-ink: #12201c;
+  --pp-muted: #55605b;
   --pp-success: #00875a;
   --pp-warning: #b45309;
   --pp-danger: #c4122f;
   --pp-font: "PayPal Open", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
   /* Chart series, PayPal blue and navy first. */
-  --pp-chart-1: #0070e0;
-  --pp-chart-2: #001c64;
-  --pp-chart-3: #00a8a8;
-  --pp-chart-4: #f5a623;
-  --pp-chart-5: #7b61ff;
-  --pp-chart-6: #e8615a;
-  --pp-chart-7: #60cdff;
-  --pp-chart-8: #2e9e6a;
-  --pp-chart-9: #b47cd8;
-  --pp-chart-10: #8a94a6;
+  --pp-chart-1: #14705a;
+  --pp-chart-2: #1f3a5f;
+  --pp-chart-3: #e0a030;
+  --pp-chart-4: #c8553d;
+  --pp-chart-5: #6c7ae0;
+  --pp-chart-6: #5fb7a0;
+  --pp-chart-7: #9bb7d4;
+  --pp-chart-8: #a3b18a;
+  --pp-chart-9: #b08968;
+  --pp-chart-10: #8a948f;
 }
 
 @theme inline {

@@ -108,7 +108,7 @@ function DataFreshness({ asOf }: { asOf: string }) {
     <p className="mt-1 flex items-center gap-2 text-sm text-pp-muted">
       <span className="inline-flex items-center gap-1.5">
         <span className="size-2 rounded-full bg-pp-success" aria-hidden />
-        PayPal sandbox
+        PayPal sandbox payments
       </span>
       <span aria-hidden>·</span>
       <span title={new Date(asOf).toLocaleString('en-GB')}>

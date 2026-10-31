@@ -1,16 +1,8 @@
-// AG Studio's data sources for the dashboard: a table for each row type in lib/dashboard-data.ts,
-// the relationships between them, a shared calendar and a few calculated measures.
+// AG Studio's data sources for the Allowance dashboard: one table each for mandates, purchases and
+// audit events, the relationships between them, a calendar, and the calculated measures.
 
-import type {
-  AgDataSourcesDefinition,
-  AgExpressionFieldDefinition,
-  AgFieldDefinition,
-  AgFormat,
-  AgRelationDefinition,
-} from 'ag-studio';
+import type { AgDataSourcesDefinition, AgExpressionFieldDefinition, AgFieldDefinition, AgFormat, AgRelationDefinition } from 'ag-studio';
 import type { DashboardData } from '@/lib/dashboard-data';
-
-// --- Helpers ----------------------------------------------------------------------
 
 const CALENDAR_ID = 'calendar';
 
@@ -20,16 +12,10 @@ type FieldSpec = [id: string, name: string, format: AgFormat, hide?: boolean];
 const fields = (specs: FieldSpec[]): AgFieldDefinition[] =>
   specs.map(([id, name, format, hide]) => ({ id, name, format, ...(hide && { hide }) }));
 
-// Foreign key 'table.field' -> primary key 'table.field'.
 const manyToOne = (id: string, source: string, target: string): AgRelationDefinition => {
   const [sourceTable, sourceField] = source.split('.');
   const [targetTable, targetField] = target.split('.');
-  return {
-    id,
-    source: { tableId: sourceTable, fieldId: sourceField },
-    target: { tableId: targetTable, fieldId: targetField },
-    type: 'many-to-one',
-  };
+  return { id, source: { tableId: sourceTable, fieldId: sourceField }, target: { tableId: targetTable, fieldId: targetField }, type: 'many-to-one' };
 };
 
 const onCalendar = (tableId: string, fieldId: string, truncate?: 'day'): AgRelationDefinition => ({
@@ -50,202 +36,92 @@ const ratio = (id: string, name: string, description: string, numerator: string,
   expression: { operator: 'divide', inputs: [sumOf(numerator), sumOf(denominator)] },
 });
 
-// --- Data sources -----------------------------------------------------------------
-
-
-// Whether the PayPal account has anything to report on. Without it, Studio would only show empty widgets.
-export const hasData = (data: DashboardData) =>
-  [data.invoices, data.transactions, data.products, data.plans, data.balances].some((rows) => rows.length > 0);
+export const hasData = (data: DashboardData) => data.purchases.length > 0 || data.mandates.length > 0;
 
 export function buildStudioData(data: DashboardData): AgDataSourcesDefinition {
-  const dates = [
-    ...data.invoices.map((r) => r.invoiceDate),
-    ...data.invoicePayments.map((r) => r.date),
-    ...data.transactions.map((r) => r.date?.slice(0, 10)),
-  ]
-    .filter((d): d is string => !!d)
-    .sort();
+  const dates = data.purchases.map((r) => r.createdDate).sort();
   const today = data.asOf.slice(0, 10);
 
   return {
     description:
-      'PayPal sandbox data fetched over the REST API for a merchant that sells subscription products and sends invoices. ' +
-      'Invoices are in USD, EUR or GBP and are not converted, so filter by currency before summing money. ' +
-      'Invoice payments are recorded externally (bank transfer, card, check, cash). The ledger holds payouts to affiliates, creators and customers.',
+      'Spending of AI shopping agents on the PayPal sandbox. Each agent works under a mandate (a per purchase cap, an amount it may spend on its own, ' +
+      'a daily and monthly budget). Every purchase an agent proposes is decided by policy: approved, held for a person, or denied. ' +
+      'Money is in US dollars. "Requested" is what the agent asked for; "Committed" is what PayPal holds or has captured.',
     sources: [
       {
-        id: 'customers',
-        description: 'Invoice recipients, keyed by lower-cased email.',
-        data: data.customers,
+        id: 'mandates',
+        description: 'One row per agent mandate with its limits. Spent today is money authorized or captured in the last 24 hours.',
+        data: data.mandates,
         fields: fields([
-          ['id', 'Customer ID', 'textFormat', true],
-          ['name', 'Customer', 'textFormat'],
-          ['company', 'Company', 'textFormat'],
-          ['email', 'Email', 'textFormat'],
+          ['id', 'Mandate ID', 'textFormat', true],
+          ['agent', 'Agent', 'textFormat'],
+          ['state', 'Mandate State', 'textFormat'],
+          ['perPurchaseCap', 'Per Purchase Cap', 'currencyFormat'],
+          ['autoApproveLimit', 'Auto Approve Limit', 'currencyFormat'],
+          ['dailyBudget', 'Daily Budget', 'currencyFormat'],
+          ['monthlyBudget', 'Monthly Budget', 'currencyFormat'],
+          ['spentToday', 'Spent Today', 'currencyFormat'],
         ]),
       },
       {
-        id: 'invoices',
+        id: 'purchases',
         description:
-          'One row per invoice. Issued amount excludes drafts, scheduled and cancelled invoices. Outstanding and aging apply only to open or partially paid invoices.',
-        data: data.invoices,
+          'One row per purchase an agent proposed. Status group says where it ended up. Requested is the price; committed counts only authorized or captured money; stopped counts purchases denied by policy or rejected by a person.',
+        data: data.purchases,
         fields: fields([
-          ['id', 'Invoice ID', 'textFormat', true],
-          ['number', 'Invoice', 'textFormat'],
-          ['customerId', 'Customer ID', 'textFormat', true],
-          ['status', 'Invoice Status', 'textFormat'],
-          ['statusGroup', 'Status Group', 'textFormat'],
-          ['currency', 'Currency', 'textFormat'],
-          ['paymentTerm', 'Payment Term', 'textFormat'],
-          ['invoiceDate', 'Invoice Date', 'dateFormat'],
-          ['dueDate', 'Due Date', 'dateFormat'],
-          ['total', 'Invoice Total', 'currencyFormat'],
-          ['issuedAmount', 'Invoiced', 'currencyFormat'],
-          ['paidAmount', 'Paid', 'currencyFormat'],
-          ['refundedAmount', 'Refunded', 'currencyFormat'],
-          ['netCollected', 'Net Collected', 'currencyFormat'],
-          ['isReceivable', 'Is Receivable', 'booleanFormat'],
-          ['outstanding', 'Outstanding', 'currencyFormat'],
-          ['overdueAmount', 'Overdue', 'currencyFormat'],
-          ['daysOverdue', 'Days Overdue', 'integerFormat'],
-          ['agingBucket', 'Aging Bucket', 'textFormat'],
-          ['daysToPay', 'Days to Pay', 'integerFormat'],
-          ['taxTotal', 'Tax', 'currencyFormat'],
+          ['id', 'Purchase ID', 'textFormat', true],
+          ['mandateId', 'Mandate ID', 'textFormat', true],
+          ['title', 'Item', 'textFormat'],
+          ['merchant', 'Merchant', 'textFormat'],
+          ['category', 'Category', 'textFormat'],
+          ['createdAt', 'Proposed At', 'dateTimeFormat'],
+          ['createdDate', 'Proposed On', 'dateFormat'],
+          ['requested', 'Requested', 'currencyFormat'],
+          ['committed', 'Committed', 'currencyFormat'],
+          ['captured', 'Captured', 'currencyFormat'],
+          ['waiting', 'Waiting for a Person', 'currencyFormat'],
+          ['stopped', 'Stopped', 'currencyFormat'],
+          ['one', 'Purchases', 'integerFormat', true],
+          ['isAuto', 'Auto Approved Flag', 'integerFormat', true],
+          ['isHeld', 'Human Decision Flag', 'integerFormat', true],
+          ['isStopped', 'Stopped Flag', 'integerFormat', true],
+          ['statusGroup', 'Status', 'textFormat'],
+          ['outcome', 'Policy Decision', 'textFormat'],
+          ['reason', 'Reason', 'textFormat'],
+          ['approvedBy', 'Approved By', 'textFormat'],
         ]),
       },
       {
-        id: 'invoiceItems',
-        name: 'Invoice Line Items',
-        description: 'Invoice lines. Line total is after line discount and tax, before invoice-level discount and shipping.',
-        data: data.invoiceItems,
+        id: 'events',
+        name: 'Audit Events',
+        description: 'The audit trail: every step a purchase went through, with the note recorded at that step.',
+        data: data.events,
         fields: fields([
-          ['id', 'Line ID', 'textFormat', true],
-          ['invoiceId', 'Invoice ID', 'textFormat', true],
-          ['name', 'Item', 'textFormat'],
-          ['unit', 'Unit', 'textFormat'],
-          ['quantity', 'Quantity', 'decimalFormat'],
-          ['unitPrice', 'Unit Price', 'currencyFormat'],
-          ['gross', 'Gross', 'currencyFormat'],
-          ['discount', 'Line Discount', 'currencyFormat'],
-          ['tax', 'Line Tax', 'currencyFormat'],
-          ['lineTotal', 'Line Total', 'currencyFormat'],
-        ]),
-      },
-      {
-        id: 'invoicePayments',
-        name: 'Invoice Payments',
-        description: 'Payments and refunds recorded against invoices. Signed amount is negative for refunds; sum it for net cash.',
-        data: data.invoicePayments,
-        fields: fields([
-          ['id', 'Payment ID', 'textFormat', true],
-          ['invoiceId', 'Invoice ID', 'textFormat', true],
-          ['kind', 'Payment Kind', 'textFormat'],
-          ['method', 'Payment Method', 'textFormat'],
-          ['date', 'Payment Date', 'dateFormat'],
-          ['amount', 'Payment Amount', 'currencyFormat'],
-          ['signedAmount', 'Net Cash', 'currencyFormat'],
-        ]),
-      },
-      {
-        id: 'products',
-        description: 'Catalog products sold as subscriptions.',
-        data: data.products,
-        fields: fields([
-          ['id', 'Product ID', 'textFormat', true],
-          ['name', 'Product', 'textFormat'],
-          ['type', 'Product Type', 'textFormat'],
-          ['category', 'Product Category', 'textFormat'],
-          ['description', 'Product Description', 'textFormat'],
-        ]),
-      },
-      {
-        id: 'plans',
-        name: 'Billing Plans',
-        description: 'Subscription billing plans, in USD. Monthly price normalises weekly, quarterly and annual pricing to one month.',
-        data: data.plans,
-        fields: fields([
-          ['id', 'Plan ID', 'textFormat', true],
-          ['productId', 'Product ID', 'textFormat', true],
-          ['name', 'Plan', 'textFormat'],
-          ['status', 'Plan Status', 'textFormat'],
-          ['billingInterval', 'Billed', 'textFormat'],
-          ['price', 'Price', 'currencyFormat'],
-          ['monthlyPrice', 'Monthly Price', 'currencyFormat'],
-          ['trialDays', 'Trial Days', 'integerFormat'],
-          ['setupFee', 'Setup Fee', 'currencyFormat'],
-        ]),
-      },
-      {
-        id: 'transactions',
-        description: 'Account ledger from Transaction Search, last 31 days. Amounts are signed (debits negative); net is amount plus fee.',
-        data: data.transactions,
-        fields: fields([
-          ['id', 'Transaction ID', 'textFormat'],
-          ['date', 'Transaction Date', 'dateTimeFormat'],
-          ['eventType', 'Event Type', 'textFormat'],
-          ['status', 'Transaction Status', 'textFormat'],
-          ['direction', 'Direction', 'textFormat'],
-          ['currency', 'Transaction Currency', 'textFormat', true],
-          ['amount', 'Transaction Amount', 'currencyFormat'],
-          ['fee', 'Transaction Fee', 'currencyFormat'],
-          ['net', 'Transaction Net', 'currencyFormat'],
-          ['endingBalance', 'Ending Balance', 'currencyFormat'],
-          ['counterparty', 'Counterparty', 'textFormat'],
-          ['note', 'Transaction Note', 'textFormat'],
-        ]),
-      },
-      {
-        id: 'payouts',
-        description: 'Individual payouts sent from the account, as positive USD amounts, grouped into campaigns.',
-        data: data.payouts,
-        fields: fields([
-          ['id', 'Payout ID', 'textFormat', true],
-          ['campaign', 'Campaign', 'textFormat'],
-          ['recipient', 'Recipient', 'textFormat'],
-          ['date', 'Payout Date', 'dateTimeFormat'],
-          ['status', 'Payout Status', 'textFormat'],
-          ['amount', 'Payout Amount', 'currencyFormat'],
-          ['fee', 'Payout Fee', 'currencyFormat'],
-          ['note', 'Payout Note', 'textFormat'],
-        ]),
-      },
-      {
-        id: 'balances',
-        description: 'Current account balance per currency.',
-        data: data.balances,
-        fields: fields([
-          ['currency', 'Balance Currency', 'textFormat'],
-          ['total', 'Total Balance', 'currencyFormat'],
-          ['available', 'Available Balance', 'currencyFormat'],
-          ['withheld', 'Withheld Balance', 'currencyFormat'],
+          ['id', 'Event ID', 'textFormat', true],
+          ['purchaseId', 'Purchase ID', 'textFormat', true],
+          ['at', 'Event Time', 'dateTimeFormat'],
+          ['event', 'Event', 'textFormat'],
+          ['note', 'Note', 'textFormat'],
         ]),
       },
     ],
     relationships: [
-      manyToOne('invoice-customer', 'invoices.customerId', 'customers.id'),
-      manyToOne('item-invoice', 'invoiceItems.invoiceId', 'invoices.id'),
-      manyToOne('payment-invoice', 'invoicePayments.invoiceId', 'invoices.id'),
-      manyToOne('plan-product', 'plans.productId', 'products.id'),
-      onCalendar('invoices', 'invoiceDate'),
-      onCalendar('invoicePayments', 'date'),
-      onCalendar('transactions', 'date', 'day'),
-      onCalendar('payouts', 'date', 'day'),
+      manyToOne('purchase-mandate', 'purchases.mandateId', 'mandates.id'),
+      manyToOne('event-purchase', 'events.purchaseId', 'purchases.id'),
+      onCalendar('purchases', 'createdAt', 'day'),
     ],
     calendars: [
       {
         id: CALENDAR_ID,
         label: 'Calendar',
-        range: {
-          from: { type: 'date', value: dates[0] ?? today },
-          to: { type: 'date', value: dates.at(-1) ?? today },
-        },
-        fragments: ['year', 'quarter', 'month', 'week', 'day', 'dayOfWeek'],
+        range: { from: { type: 'date', value: dates[0] ?? today }, to: { type: 'date', value: dates.at(-1) ?? today } },
+        fragments: ['year', 'month', 'week', 'day', 'dayOfWeek'],
       },
     ],
     expressions: [
-      ratio('collectionRate', 'Collection Rate', 'Paid / invoiced. Filter to one currency first.', 'invoices.paidAmount', 'invoices.issuedAmount'),
-      ratio('overdueShare', 'Overdue Share', 'Share of outstanding receivables that is past due.', 'invoices.overdueAmount', 'invoices.outstanding'),
-      ratio('refundRate', 'Refund Rate', 'Refunded / paid.', 'invoices.refundedAmount', 'invoices.paidAmount'),
+      ratio('autoShare', 'Approved By Policy Share', 'Purchases approved by policy with no person involved, as a share of all purchases.', 'purchases.isAuto', 'purchases.one'),
+      ratio('stopRate', 'Stopped Rate', 'Purchases denied by policy or rejected by a person, as a share of all purchases.', 'purchases.isStopped', 'purchases.one'),
+      ratio('dailyUse', 'Daily Budget Used', 'Spent today as a share of the daily budget.', 'mandates.spentToday', 'mandates.dailyBudget'),
     ],
   };
 }

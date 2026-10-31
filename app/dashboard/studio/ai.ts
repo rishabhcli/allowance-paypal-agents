@@ -1,23 +1,14 @@
 // The AG Studio AI assistant. The adapter calls `${endpoint}/responses`, i.e. this app's proxy at
-// app/api/ai/responses, which holds the OpenAI key, so nothing secret is sent from the browser.
+// app/api/ai/responses, which holds the Fireworks key, so nothing secret is sent from the browser.
 
 import { createAiHarness, type AgAiHarnessSetup, type AgAiPromptStarter } from 'ag-studio';
 import { openaiAdapter } from './openai-adapter';
 
 // Suggestions shown in a new AI conversation, before anything has been typed.
 const PROMPT_STARTERS: AgAiPromptStarter[] = [
-  {
-    label: 'Summarise this page',
-    prompt: 'Summarise what this page shows: every widget, the fields it reads, and what stands out.',
-  },
-  {
-    label: 'Overdue invoices',
-    prompt: 'Which customers owe the most on overdue invoices?',
-  },
-  {
-    label: 'Revenue by month',
-    prompt: 'Add a chart of paid invoice revenue by month.',
-  },
+  { label: 'Summarise this page', prompt: 'Summarise what this page shows: every widget, the fields it reads, and what stands out.' },
+  { label: 'Why was money stopped?', prompt: 'Which purchases were stopped and why? Group by reason and show the amount stopped for each.' },
+  { label: 'Add a retailer chart', prompt: 'Add a chart of requested amount by retailer, split by status.' },
 ];
 
 // `models` are the ids allowed by OPENAI_MODELS on the server; the first is the default, and the

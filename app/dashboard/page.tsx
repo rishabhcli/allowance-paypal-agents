@@ -9,11 +9,11 @@ export const metadata: Metadata = {
 };
 
 export default async function DashboardPage() {
-  // Live PayPal data: render per request, not at build time.
+  // Live agent activity: render per request, not at build time.
   await connection();
   const data = await getDashboardData();
 
-  // Only the model ids reach the client; the OpenAI key stays on the server (lib/ai.ts).
+  // Only the model ids reach the client; the Fireworks key stays on the server (lib/ai.ts).
   return (
     <Dashboard
       data={data}
