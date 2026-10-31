@@ -1,0 +1,112 @@
+// Small JSON-file store for mandates and purchases. Good enough for a demo and for judges who run it
+// locally: state survives a restart in `.data/state.json`, and a missing or unwritable file just means
+// in-memory state. Replace with a database for anything real.
+
+import fs from 'node:fs';
+import path from 'node:path';
+import type { Decision, Mandate, PurchaseStatus } from './policy.ts';
+
+export type Purchase = {
+  id: string;
+  mandateId: string;
+  agent: string;
+  productId: string;
+  title: string;
+  merchant: string;
+  category?: string;
+  amountCents: number;
+  currency: string;
+  buyUrl?: string;
+  rationale: string; // why the agent wants it, in the agent's words
+  status: PurchaseStatus;
+  decision: Decision;
+  approvedBy?: 'policy' | 'human';
+  orderId?: string;
+  approveUrl?: string;
+  authorizationId?: string;
+  captureId?: string;
+  capturedCents?: number;
+  createdAt: string;
+  updatedAt: string;
+  log: { at: string; event: string; note?: string }[];
+};
+
+type State = { mandates: Mandate[]; purchases: Purchase[] };
+
+const FILE = path.join(process.cwd(), '.data', 'state.json');
+let state: State | undefined;
+
+export const DEFAULT_MANDATES: Mandate[] = [
+  {
+    id: 'gift-finder',
+    agent: 'gift-finder',
+    currency: 'USD',
+    perPurchaseCapCents: 15000,
+    autoApproveUpToCents: 3000,
+    dailyBudgetCents: 25000,
+    monthlyBudgetCents: 100000,
+    maxAutoApprovalsPerHour: 5,
+    blockedMerchants: [],
+    paused: false,
+  },
+  {
+    id: 'office-restock',
+    agent: 'office-restock',
+    currency: 'USD',
+    perPurchaseCapCents: 8000,
+    autoApproveUpToCents: 2500,
+    dailyBudgetCents: 10000,
+    paused: false,
+  },
+];
+
+function load(): State {
+  if (state) return state;
+  try {
+    state = JSON.parse(fs.readFileSync(FILE, 'utf8')) as State;
+  } catch {
+    state = { mandates: structuredClone(DEFAULT_MANDATES), purchases: [] };
+  }
+  return state;
+}
+
+function save() {
+  try {
+    fs.mkdirSync(path.dirname(FILE), { recursive: true });
+    fs.writeFileSync(FILE, JSON.stringify(state, null, 2));
+  } catch {
+    /* read-only filesystem: stay in memory */
+  }
+}
+
+export const mandates = () => load().mandates;
+export const purchases = () => load().purchases;
+export const getMandate = (id: string) => load().mandates.find((m) => m.id === id);
+export const getPurchase = (id: string) => load().purchases.find((p) => p.id === id);
+export const findByOrder = (orderId: string) => load().purchases.find((p) => p.orderId === orderId);
+export const findByAuthorization = (authId: string) => load().purchases.find((p) => p.authorizationId === authId);
+
+export function addPurchase(p: Purchase) {
+  load().purchases.unshift(p);
+  save();
+}
+
+export function updateMandate(id: string, patch: Partial<Mandate>) {
+  const m = getMandate(id);
+  if (!m) return undefined;
+  Object.assign(m, patch);
+  save();
+  return m;
+}
+
+export function touch(p: Purchase, event: string, note?: string) {
+  const at = new Date().toISOString();
+  p.updatedAt = at;
+  p.log.push({ at, event, note });
+  save();
+}
+
+export function resetState() {
+  state = { mandates: structuredClone(DEFAULT_MANDATES), purchases: [] };
+  save();
+}
